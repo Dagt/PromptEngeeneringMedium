@@ -1,0 +1,747 @@
+ Claro. Aquí está el código completo y compilable para los endpoints solicitados, siguiendo estrictamente las especificaciones y mejores prácticas.
+
+  FILE: src/main/java/com/nova/middleware/dto/request/PaymentRequest.java
+
+    1 package com.nova.middleware.dto.request;
+    2
+    3 import jakarta.validation.constraints.DecimalMax;
+    4 import jakarta.validation.constraints.DecimalMin;
+    5 import jakarta.validation.constraints.NotBlank;
+    6 import jakarta.validation.constraints.NotNull;
+    7 import jakarta.validation.constraints.Pattern;
+    8 import jakarta.validation.constraints.Size;
+    9
+   10 public class PaymentRequest {
+   11
+   12     @NotBlank(message = "El ID de la cuenta de origen no puede estar vacío.")
+   13     @Pattern(regexp = "^ACC-[0-9]{10}$", message = "El formato del ID de la cuenta de origen es inválido. Debe ser ACC- seguido de 10 dígitos.")
+   14     private String sourceAccountId;
+   15
+   16     @NotBlank(message = "El ID de la cuenta de destino no puede estar vacío.")
+   17     @Pattern(regexp = "^ACC-[0-9]{10}$", message = "El formato del ID de la cuenta de destino es inválido. Debe ser ACC- seguido de 10 dígitos.")
+   18     private String destinationAccountId;
+   19
+   20     @NotNull(message = "El monto no puede ser nulo.")
+   21     @DecimalMin(value = "0.01", message = "El monto debe ser mayor a 0.")
+   22     @DecimalMax(value = "1000000.00", message = "El monto no puede exceder 1,000,000.")
+   23     private Double amount;
+   24
+   25     @NotBlank(message = "La moneda no puede estar vacía.")
+   26     @Pattern(regexp = "MXN|USD", message = "La moneda debe ser 'MXN' o 'USD'.")
+   27     private String currency;
+   28
+   29     @Size(max = 100, message = "La referencia no puede exceder los 100 caracteres.")
+   30     private String reference;
+   31
+   32     // Getters y Setters
+   33     public String getSourceAccountId() {
+   34         return sourceAccountId;
+   35     }
+   36
+   37     public void setSourceAccountId(String sourceAccountId) {
+   38         this.sourceAccountId = sourceAccountId;
+   39     }
+   40
+   41     public String getDestinationAccountId() {
+   42         return destinationAccountId;
+   43     }
+   44
+   45     public void setDestinationAccountId(String destinationAccountId) {
+   46         this.destinationAccountId = destinationAccountId;
+   47     }
+   48
+   49     public Double getAmount() {
+   50         return amount;
+   51     }
+   52
+   53     public void setAmount(Double amount) {
+   54         this.amount = amount;
+   55     }
+   56
+   57     public String getCurrency() {
+   58         return currency;
+   59     }
+   60
+   61     public void setCurrency(String currency) {
+   62         this.currency = currency;
+   63     }
+   64
+   65     public String getReference() {
+   66         return reference;
+   67     }
+   68
+   69     public void setReference(String reference) {
+   70         this.reference = reference;
+   71     }
+   72 }
+  FILE: src/main/java/com/nova/middleware/dto/response/PaymentResponse.java
+
+    1 package com.nova.middleware.dto.response;
+    2
+    3 import java.time.OffsetDateTime;
+    4
+    5 public class PaymentResponse {
+    6
+    7     private String transactionId;
+    8     private String status;
+    9     private OffsetDateTime timestamp;
+   10     private Double amount;
+   11
+   12     public enum Status {
+   13         PENDING, COMPLETED, FAILED
+   14     }
+   15
+   16     // Constructores, Getters y Setters
+   17     public PaymentResponse() {
+   18     }
+   19
+   20     public PaymentResponse(String transactionId, String status, OffsetDateTime timestamp, Double amount) {
+   21         this.transactionId = transactionId;
+   22         this.status = status;
+   23         this.timestamp = timestamp;
+   24         this.amount = amount;
+   25     }
+   26
+   27     public String getTransactionId() {
+   28         return transactionId;
+   29     }
+   30
+   31     public void setTransactionId(String transactionId) {
+   32         this.transactionId = transactionId;
+   33     }
+   34
+   35     public String getStatus() {
+   36         return status;
+   37     }
+   38
+   39     public void setStatus(String status) {
+   40         this.status = status;
+   41     }
+   42
+   43     public OffsetDateTime getTimestamp() {
+   44         return timestamp;
+   45     }
+   46
+   47     public void setTimestamp(OffsetDateTime timestamp) {
+   48         this.timestamp = timestamp;
+   49     }
+   50
+   51     public Double getAmount() {
+   52         return amount;
+   53     }
+   54
+   55     public void setAmount(Double amount) {
+   56         this.amount = amount;
+   57     }
+   58 }
+  FILE: src/main/java/com/nova/middleware/dto/request/LoanApplicationRequest.java
+
+    1 package com.nova.middleware.dto.request;
+    2
+    3 import jakarta.validation.constraints.NotNull;
+    4
+    5 public class LoanApplicationRequest {
+    6
+    7     @NotNull(message = "El ID de cliente no puede ser nulo.")
+    8     private String customerId;
+    9
+   10     @NotNull(message = "El monto no puede ser nulo.")
+   11     private Double amount;
+   12
+   13     @NotNull(message = "El plazo en meses no puede ser nulo.")
+   14     private Integer termMonths;
+   15
+   16     private String purpose;
+   17
+   18     // Getters y Setters
+   19     public String getCustomerId() {
+   20         return customerId;
+   21     }
+   22
+   23     public void setCustomerId(String customerId) {
+   24         this.customerId = customerId;
+   25     }
+   26
+   27     public Double getAmount() {
+   28         return amount;
+   29     }
+   30
+   31     public void setAmount(Double amount) {
+   32         this.amount = amount;
+   33     }
+   34
+   35     public Integer getTermMonths() {
+   36         return termMonths;
+   37     }
+   38
+   39     public void setTermMonths(Integer termMonths) {
+   40         this.termMonths = termMonths;
+   41     }
+   42
+   43     public String getPurpose() {
+   44         return purpose;
+   45     }
+   46
+   47     public void setPurpose(String purpose) {
+   48         this.purpose = purpose;
+   49     }
+   50 }
+  FILE: src/main/java/com/nova/middleware/dto/response/LoanResponse.java
+
+    1 package com.nova.middleware.dto.response;
+    2
+    3 public class LoanResponse {
+    4
+    5     private String loanId;
+    6     private String status;
+    7     private Double approvedAmount;
+    8     private Double interestRate;
+    9     private Integer creditScore;
+   10
+   11     public enum Status {
+   12         PENDING_APPROVAL, APPROVED, REJECTED, DISBURSED
+   13     }
+   14
+   15     // Constructores, Getters y Setters
+   16     public LoanResponse() {
+   17     }
+   18
+   19     public LoanResponse(String loanId, String status, Double approvedAmount, Double interestRate, Integer creditScore) {
+   20         this.loanId = loanId;
+   21         this.status = status;
+   22         this.approvedAmount = approvedAmount;
+   23         this.interestRate = interestRate;
+   24         this.creditScore = creditScore;
+   25     }
+   26
+   27     public String getLoanId() {
+   28         return loanId;
+   29     }
+   30
+   31     public void setLoanId(String loanId) {
+   32         this.loanId = loanId;
+   33     }
+   34
+   35     public String getStatus() {
+   36         return status;
+   37     }
+   38
+   39     public void setStatus(String status) {
+   40         this.status = status;
+   41     }
+   42
+   43     public Double getApprovedAmount() {
+   44         return approvedAmount;
+   45     }
+   46
+   47     public void setApprovedAmount(Double approvedAmount) {
+   48         this.approvedAmount = approvedAmount;
+   49     }
+   50
+   51     public Double getInterestRate() {
+   52         return interestRate;
+   53     }
+   54
+   55     public void setInterestRate(Double interestRate) {
+   56         this.interestRate = interestRate;
+   57     }
+   58
+   59     public Integer getCreditScore() {
+   60         return creditScore;
+   61     }
+   62
+   63     public void setCreditScore(Integer creditScore) {
+   64         this.creditScore = creditScore;
+   65     }
+   66 }
+  FILE: src/main/java/com/nova/middleware/dto/response/ErrorResponse.java
+
+    1 package com.nova.middleware.dto.response;
+    2
+    3 import com.fasterxml.jackson.annotation.JsonInclude;
+    4
+    5 import java.time.OffsetDateTime;
+    6 import java.util.List;
+    7
+    8 @JsonInclude(JsonInclude.Include.NON_NULL)
+    9 public class ErrorResponse {
+   10
+   11     private OffsetDateTime timestamp;
+   12     private String error;
+   13     private String message;
+   14     private List<String> details;
+   15
+   16     public ErrorResponse(String error, String message) {
+   17         this.timestamp = OffsetDateTime.now();
+   18         this.error = error;
+   19         this.message = message;
+   20     }
+   21
+   22     public ErrorResponse(String error, String message, List<String> details) {
+   23         this.timestamp = OffsetDateTime.now();
+   24         this.error = error;
+   25         this.message = message;
+   26         this.details = details;
+   27     }
+   28
+   29     // Getters y Setters
+   30     public OffsetDateTime getTimestamp() {
+   31         return timestamp;
+   32     }
+   33
+   34     public void setTimestamp(OffsetDateTime timestamp) {
+   35         this.timestamp = timestamp;
+   36     }
+   37
+   38     public String getError() {
+   39         return error;
+   40     }
+   41
+   42     public void setError(String error) {
+   43         this.error = error;
+   44     }
+   45
+   46     public String getMessage() {
+   47         return message;
+   48     }
+   49
+   50     public void setMessage(String message) {
+   51         this.message = message;
+   52     }
+   53
+   54     public List<String> getDetails() {
+   55         return details;
+   56     }
+   57
+   58     public void setDetails(List<String> details) {
+   59         this.details = details;
+   60     }
+   61 }
+  FILE: src/main/java/com/nova/middleware/service/PaymentService.java
+
+   1 package com.nova.middleware.service;
+   2
+   3 import com.nova.middleware.dto.request.PaymentRequest;
+   4 import com.nova.middleware.dto.response.PaymentResponse;
+   5
+   6 public interface PaymentService {
+   7     PaymentResponse createPayment(PaymentRequest paymentRequest);
+   8     PaymentResponse getPaymentById(String transactionId);
+   9 }
+  FILE: src/main/java/com/nova/middleware/service/PaymentServiceImpl.java
+
+    1 package com.nova.middleware.service;
+    2
+    3 import com.nova.middleware.dto.request.PaymentRequest;
+    4 import com.nova.middleware.dto.response.PaymentResponse;
+    5 import com.nova.middleware.exception.TransactionNotFoundException;
+    6 import org.springframework.stereotype.Service;
+    7
+    8 import java.time.OffsetDateTime;
+    9 import java.util.UUID;
+   10
+   11 @Service
+   12 public class PaymentServiceImpl implements PaymentService {
+   13
+   14     @Override
+   15     public PaymentResponse createPayment(PaymentRequest paymentRequest) {
+   16         // Lógica de negocio mockeada
+   17         return new PaymentResponse(
+   18             "TXN-" + System.currentTimeMillis(),
+   19             PaymentResponse.Status.COMPLETED.name(),
+   20             OffsetDateTime.now(),
+   21             paymentRequest.getAmount()
+   22         );
+   23     }
+   24
+   25     @Override
+   26     public PaymentResponse getPaymentById(String transactionId) {
+   27         // Lógica de negocio mockeada
+   28         if ("TXN-0000000000000".equals(transactionId)) {
+   29             throw new TransactionNotFoundException("Pago no encontrado para el ID: " + transactionId);
+   30         }
+   31
+   32         return new PaymentResponse(
+   33             transactionId,
+   34             PaymentResponse.Status.COMPLETED.name(),
+   35             OffsetDateTime.now().minusHours(1),
+   36             15000.50
+   37         );
+   38     }
+   39 }
+  FILE: src/main/java/com/nova/middleware/service/LoanService.java
+
+   1 package com.nova.middleware.service;
+   2
+   3 import com.nova.middleware.dto.request.LoanApplicationRequest;
+   4 import com.nova.middleware.dto.response.LoanResponse;
+   5
+   6 public interface LoanService {
+   7     LoanResponse createLoanApplication(LoanApplicationRequest loanApplicationRequest);
+   8 }
+  FILE: src/main/java/com/nova/middleware/service/LoanServiceImpl.java
+
+    1 package com.nova.middleware.service;
+    2
+    3 import com.nova.middleware.dto.request.LoanApplicationRequest;
+    4 import com.nova.middleware.dto.response.LoanResponse;
+    5 import org.springframework.stereotype.Service;
+    6
+    7 import java.util.UUID;
+    8
+    9 @Service
+   10 public class LoanServiceImpl implements LoanService {
+   11
+   12     @Override
+   13     public LoanResponse createLoanApplication(LoanApplicationRequest loanApplicationRequest) {
+   14         // Lógica de negocio mockeada
+   15         return new LoanResponse(
+   16             "LOAN-2025-" + UUID.randomUUID().toString().substring(0, 8),
+   17             LoanResponse.Status.PENDING_APPROVAL.name(),
+   18             loanApplicationRequest.getAmount(),
+   19             8.5,
+   20             720
+   21         );
+   22     }
+   23 }
+  FILE: src/main/java/com/nova/middleware/exception/TransactionNotFoundException.java
+
+    1 package com.nova.middleware.exception;
+    2
+    3 import org.springframework.http.HttpStatus;
+    4 import org.springframework.web.bind.annotation.ResponseStatus;
+    5
+    6 @ResponseStatus(HttpStatus.NOT_FOUND)
+    7 public class TransactionNotFoundException extends RuntimeException {
+    8     public TransactionNotFoundException(String message) {
+    9         super(message);
+   10     }
+   11 }
+  FILE: src/main/java/com/nova/middleware/exception/GlobalExceptionHandler.java
+
+    1 package com.nova.middleware.exception;
+    2
+    3 import com.nova.middleware.dto.response.ErrorResponse;
+    4 import org.springframework.http.HttpHeaders;
+    5 import org.springframework.http.HttpStatus;
+    6 import org.springframework.http.HttpStatusCode;
+    7 import org.springframework.http.ResponseEntity;
+    8 import org.springframework.web.bind.MethodArgumentNotValidException;
+    9 import org.springframework.web.bind.annotation.ExceptionHandler;
+   10 import org.springframework.web.bind.annotation.RestControllerAdvice;
+   11 import org.springframework.web.context.request.WebRequest;
+   12 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+   13
+   14 import java.util.stream.Collectors;
+   15
+   16 @RestControllerAdvice
+   17 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+   18
+   19     @Override
+   20     protected ResponseEntity<Object> handleMethodArgumentNotValid(
+   21             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+   22
+   23         var details = ex.getBindingResult()
+   24                 .getFieldErrors()
+   25                 .stream()
+   26                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
+   27                 .collect(Collectors.toList());
+   28
+   29         var errorResponse = new ErrorResponse("BadRequest", "La validación de la solicitud falló", details);
+   30         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+   31     }
+   32
+   33     @ExceptionHandler(TransactionNotFoundException.class)
+   34     public ResponseEntity<ErrorResponse> handleTransactionNotFoundException(TransactionNotFoundException ex, WebRequest request) {
+   35         var errorResponse = new ErrorResponse("NotFound", ex.getMessage());
+   36         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+   37     }
+   38
+   39     @ExceptionHandler(Exception.class)
+   40     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
+   41         var errorResponse = new ErrorResponse("InternalServerError", "Ocurrió un error inesperado al procesar la solicitud.");
+   42         // En un entorno real, aquí se registraría el 'ex' completo.
+   43         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+   44     }
+   45 }
+  FILE: src/main/java/com/nova/middleware/controller/PaymentController.java
+
+    1 package com.nova.middleware.controller;
+    2
+    3 import com.nova.middleware.dto.request.PaymentRequest;
+    4 import com.nova.middleware.dto.response.PaymentResponse;
+    5 import com.nova.middleware.service.PaymentService;
+    6 import jakarta.validation.Valid;
+    7 import jakarta.validation.constraints.Pattern;
+    8 import org.springframework.http.HttpStatus;
+    9 import org.springframework.http.ResponseEntity;
+   10 import org.springframework.security.access.prepost.PreAuthorize;
+   11 import org.springframework.validation.annotation.Validated;
+   12 import org.springframework.web.bind.annotation.*;
+   13
+   14 @RestController
+   15 @RequestMapping("/payments")
+   16 @Validated
+   17 public class PaymentController {
+   18
+   19     private final PaymentService paymentService;
+   20
+   21     public PaymentController(PaymentService paymentService) {
+   22         this.paymentService = paymentService;
+   23     }
+   24
+   25     @PostMapping
+   26     @PreAuthorize("isAuthenticated()")
+   27     public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody PaymentRequest paymentRequest) {
+   28         PaymentResponse response = paymentService.createPayment(paymentRequest);
+   29         return new ResponseEntity<>(response, HttpStatus.CREATED);
+   30     }
+   31
+   32     @GetMapping("/{transactionId}")
+   33     @PreAuthorize("isAuthenticated()")
+   34     public ResponseEntity<PaymentResponse> getPaymentStatus(
+   35             @PathVariable @Pattern(regexp = "^TXN-[0-9]{13}$", message = "El formato del ID de transacción es inválido.") String transactionId) {
+   36         PaymentResponse response = paymentService.getPaymentById(transactionId);
+   37         return ResponseEntity.ok(response);
+   38     }
+   39 }
+  FILE: src/main/java/com/nova/middleware/controller/LoanController.java
+
+    1 package com.nova.middleware.controller;
+    2
+    3 import com.nova.middleware.dto.request.LoanApplicationRequest;
+    4 import com.nova.middleware.dto.response.LoanResponse;
+    5 import com.nova.middleware.service.LoanService;
+    6 import jakarta.validation.Valid;
+    7 import org.springframework.http.HttpStatus;
+    8 import org.springframework.http.ResponseEntity;
+    9 import org.springframework.security.access.prepost.PreAuthorize;
+   10 import org.springframework.web.bind.annotation.PostMapping;
+   11 import org.springframework.web.bind.annotation.RequestBody;
+   12 import org.springframework.web.bind.annotation.RequestMapping;
+   13 import org.springframework.web.bind.annotation.RestController;
+   14
+   15 @RestController
+   16 @RequestMapping("/loans")
+   17 public class LoanController {
+   18
+   19     private final LoanService loanService;
+   20
+   21     public LoanController(LoanService loanService) {
+   22         this.loanService = loanService;
+   23     }
+   24
+   25     @PostMapping("/applications")
+   26     @PreAuthorize("hasAuthority('SCOPE_write:loans')")
+   27     public ResponseEntity<LoanResponse> createLoanApplication(@Valid @RequestBody LoanApplicationRequest loanApplicationRequest) {
+   28         LoanResponse response = loanService.createLoanApplication(loanApplicationRequest);
+   29         return new ResponseEntity<>(response, HttpStatus.CREATED);
+   30     }
+   31 }
+  FILE: src/main/java/com/nova/middleware/config/SecurityConfig.java
+
+    1 package com.nova.middleware.config;
+    2
+    3 import org.springframework.context.annotation.Bean;
+    4 import org.springframework.context.annotation.Configuration;
+    5 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+    6 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    7 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    8 import org.springframework.security.config.http.SessionCreationPolicy;
+    9 import org.springframework.security.web.SecurityFilterChain;
+   10
+   11 import static org.springframework.security.config.Customizer.withDefaults;
+   12
+   13 @Configuration
+   14 @EnableWebSecurity
+   15 @EnableMethodSecurity(prePostEnabled = true)
+   16 public class SecurityConfig {
+   17
+   18     @Bean
+   19     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+   20         http
+   21             .csrf(csrf -> csrf.disable())
+   22             .authorizeHttpRequests(authorize -> authorize
+   23                 .anyRequest().authenticated()
+   24             )
+   25             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+   26             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+   27
+   28         return http.build();
+   29     }
+   30 }
+  FILE: src/test/java/com/nova/middleware/controller/PaymentControllerTest.java
+
+    1 package com.nova.middleware.controller;
+    2
+    3 import com.fasterxml.jackson.databind.ObjectMapper;
+    4 import com.nova.middleware.dto.request.PaymentRequest;
+    5 import com.nova.middleware.dto.response.PaymentResponse;
+    6 import com.nova.middleware.exception.TransactionNotFoundException;
+    7 import com.nova.middleware.service.PaymentService;
+    8 import org.junit.jupiter.api.Test;
+    9 import org.springframework.beans.factory.annotation.Autowired;
+   10 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+   11 import org.springframework.boot.test.mock.mockito.MockBean;
+   12 import org.springframework.http.MediaType;
+   13 import org.springframework.security.test.context.support.WithMockUser;
+   14 import org.springframework.test.web.servlet.MockMvc;
+   15
+   16 import java.time.OffsetDateTime;
+   17
+   18 import static org.mockito.ArgumentMatchers.any;
+   19 import static org.mockito.Mockito.when;
+   20 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+   21 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+   22 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+   23 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+   24 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+   25
+   26 @WebMvcTest(PaymentController.class)
+   27 class PaymentControllerTest {
+   28
+   29     @Autowired
+   30     private MockMvc mockMvc;
+   31
+   32     @MockBean
+   33     private PaymentService paymentService;
+   34
+   35     @Autowired
+   36     private ObjectMapper objectMapper;
+   37
+   38     @Test
+   39     @WithMockUser
+   40     void createPayment_HappyPath_ShouldReturnCreated() throws Exception {
+   41         PaymentRequest request = new PaymentRequest();
+   42         request.setSourceAccountId("ACC-1234567890");
+   43         request.setDestinationAccountId("ACC-0987654321");
+   44         request.setAmount(100.0);
+   45         request.setCurrency("MXN");
+   46
+   47         PaymentResponse response = new PaymentResponse("TXN-1234567890123", "COMPLETED", OffsetDateTime.now(), 100.0);
+   48         when(paymentService.createPayment(any(PaymentRequest.class))).thenReturn(response);
+   49
+   50         mockMvc.perform(post("/payments")
+   51                 .contentType(MediaType.APPLICATION_JSON)
+   52                 .content(objectMapper.writeValueAsString(request))
+   53                 .with(csrf()))
+   54                 .andExpect(status().isCreated())
+   55                 .andExpect(jsonPath("$.transactionId").value("TXN-1234567890123"));
+   56     }
+   57
+   58     @Test
+   59     @WithMockUser
+   60     void createPayment_InvalidRequest_ShouldReturnBadRequest() throws Exception {
+   61         PaymentRequest request = new PaymentRequest();
+   62         request.setSourceAccountId("INVALID-ID"); // Invalid pattern
+   63         request.setDestinationAccountId("ACC-0987654321");
+   64         request.setAmount(100.0);
+   65         request.setCurrency("MXN");
+   66
+   67         mockMvc.perform(post("/payments")
+   68                 .contentType(MediaType.APPLICATION_JSON)
+   69                 .content(objectMapper.writeValueAsString(request))
+   70                 .with(csrf()))
+   71                 .andExpect(status().isBadRequest())
+   72                 .andExpect(jsonPath("$.error").value("BadRequest"));
+   73     }
+   74
+   75     @Test
+   76     @WithMockUser
+   77     void getPaymentStatus_HappyPath_ShouldReturnOk() throws Exception {
+   78         String transactionId = "TXN-1234567890123";
+   79         PaymentResponse response = new PaymentResponse(transactionId, "COMPLETED", OffsetDateTime.now(), 150.0);
+   80         when(paymentService.getPaymentById(transactionId)).thenReturn(response);
+   81
+   82         mockMvc.perform(get("/payments/{transactionId}", transactionId))
+   83                 .andExpect(status().isOk())
+   84                 .andExpect(jsonPath("$.transactionId").value(transactionId));
+   85     }
+   86
+   87     @Test
+   88     @WithMockUser
+   89     void getPaymentStatus_NotFound_ShouldReturnNotFound() throws Exception {
+   90         String transactionId = "TXN-1234567890123";
+   91         when(paymentService.getPaymentById(transactionId)).thenThrow(new TransactionNotFoundException("Pago no encontrado"));
+   92
+   93         mockMvc.perform(get("/payments/{transactionId}", transactionId))
+   94                 .andExpect(status().isNotFound())
+   95                 .andExpect(jsonPath("$.error").value("NotFound"));
+   96     }
+   97 }
+  FILE: src/test/java/com/nova/middleware/controller/LoanControllerTest.java
+
+    1 package com.nova.middleware.controller;
+    2
+    3 import com.fasterxml.jackson.databind.ObjectMapper;
+    4 import com.nova.middleware.dto.request.LoanApplicationRequest;
+    5 import com.nova.middleware.dto.response.LoanResponse;
+    6 import com.nova.middleware.service.LoanService;
+    7 import org.junit.jupiter.api.Test;
+    8 import org.springframework.beans.factory.annotation.Autowired;
+    9 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+   10 import org.springframework.boot.test.mock.mockito.MockBean;
+   11 import org.springframework.http.MediaType;
+   12 import org.springframework.security.test.context.support.WithMockUser;
+   13 import org.springframework.test.web.servlet.MockMvc;
+   14
+   15 import static org.mockito.ArgumentMatchers.any;
+   16 import static org.mockito.Mockito.when;
+   17 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+   18 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+   19 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+   20 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+   21
+   22 @WebMvcTest(LoanController.class)
+   23 class LoanControllerTest {
+   24
+   25     @Autowired
+   26     private MockMvc mockMvc;
+   27
+   28     @MockBean
+   29     private LoanService loanService;
+   30
+   31     @Autowired
+   32     private ObjectMapper objectMapper;
+   33
+   34     @Test
+   35     @WithMockUser(authorities = "SCOPE_write:loans")
+   36     void createLoanApplication_HappyPath_ShouldReturnCreated() throws Exception {
+   37         LoanApplicationRequest request = new LoanApplicationRequest();
+   38         request.setCustomerId("CUST-12345");
+   39         request.setAmount(50000.0);
+   40         request.setTermMonths(36);
+   41
+   42         LoanResponse response = new LoanResponse("LOAN-2025-12345", "PENDING_APPROVAL", 50000.0, 9.5, 750);
+   43         when(loanService.createLoanApplication(any(LoanApplicationRequest.class))).thenReturn(response);
+   44
+   45         mockMvc.perform(post("/loans/applications")
+   46                 .contentType(MediaType.APPLICATION_JSON)
+   47                 .content(objectMapper.writeValueAsString(request))
+   48                 .with(csrf()))
+   49                 .andExpect(status().isCreated())
+   50                 .andExpect(jsonPath("$.loanId").value("LOAN-2025-12345"));
+   51     }
+   52
+   53     @Test
+   54     @WithMockUser(authorities = "SCOPE_write:loans")
+   55     void createLoanApplication_InvalidRequest_ShouldReturnBadRequest() throws Exception {
+   56         LoanApplicationRequest request = new LoanApplicationRequest();
+   57         // Missing customerId and amount
+   58         request.setTermMonths(36);
+   59
+   60         mockMvc.perform(post("/loans/applications")
+   61                 .contentType(MediaType.APPLICATION_JSON)
+   62                 .content(objectMapper.writeValueAsString(request))
+   63                 .with(csrf()))
+   64                 .andExpect(status().isBadRequest())
+   65                 .andExpect(jsonPath("$.error").value("BadRequest"))
+   66                 .andExpect(jsonPath("$.details").isArray());
+   67     }
+   68 }
+
+ℹ Citations:
+  https://github.com/CurrencyCloud/currencycloud-java
+  https://github.com/Raj-Release/gal-allied
+  https://github.com/rishabh9/riko
+  https://github.com/wso2/msf4j
