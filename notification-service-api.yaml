@@ -1,0 +1,220 @@
+openapi: 3.0.3
+info:
+  title: Notification Service API
+  description: |
+    API para envío de notificaciones multicanal (Email, SMS, Push) - Banco del Pacífico
+
+    **Políticas de Seguridad:**
+    - Todos los endpoints requieren autenticación JWT
+    - Rate limiting: 100 requests/minuto por cliente
+    - CORS: Solo dominios autorizados (*.bancoPacifico.com.mx)
+  version: 2.1.0
+  contact:
+    name: Nova Solution Systems - Notifications Team
+    email: notifications@novasolutionsystems.com
+
+servers:
+  - url: https://api.bancoPacifico.com.mx/api/v2
+    description: Production server (v2)
+  - url: https://api.bancoPacifico.com.mx/api/v1
+    description: Production server (v1 - deprecated)
+  - url: https://api-staging.bancoPacifico.com.mx/api/v2
+    description: Staging server
+
+security:
+  - JWTAuth: []
+
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token con claims: sub (userId), roles (array), exp (timestamp).
+        Obtener token en POST /auth/login
+
+  schemas:
+    NotificationRequest:
+      type: object
+      required:
+        - recipientId
+        - channel
+        - template
+      properties:
+        recipientId:
+          type: string
+          pattern: '^CUST-[0-9]{10}$'
+          description: ID del cliente destinatario
+          example: CUST-1234567890
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH, WHATSAPP]
+          description: Canal de envío
+        template:
+          type: string
+          pattern: '^TPL-[A-Z0-9]{8}$'
+          description: ID del template a usar
+          example: TPL-PAYMENT1
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+          maxProperties: 20
+          description: Variables para el template (max 20)
+        priority:
+          type: string
+          enum: [LOW, NORMAL, HIGH, URGENT]
+          default: NORMAL
+
+    NotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: NOTIF-2025012700001
+        status:
+          type: string
+          enum: [QUEUED, SENT, DELIVERED, FAILED]
+        sentAt:
+          type: string
+          format: date-time
+        channel:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código de error público
+          example: INVALID_RECIPIENT
+        message:
+          type: string
+          description: Mensaje descriptivo para el usuario
+          example: El ID del destinatario no es válido
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+          description: ID para rastrear el request en logs
+
+paths:
+  /notifications:
+    post:
+      summary: Enviar notificación
+      description: Encola una notificación para envío a través del canal especificado
+      operationId: sendNotification
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '202':
+          description: Notificación aceptada y encolada
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+              description: Requests máximos por minuto
+              example: 100
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+              description: Requests restantes en ventana actual
+              example: 87
+            X-RateLimit-Reset:
+              schema:
+                type: integer
+              description: Timestamp cuando se resetea el límite
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: Request inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Token JWT inválido o expirado
+        '403':
+          description: Sin permisos para enviar notificaciones
+        '429':
+          description: Rate limit excedido
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Segundos para reintentar
+
+  /notifications/{notificationId}:
+    get:
+      summary: Consultar estado de notificación
+      operationId: getNotificationStatus
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^NOTIF-[0-9]{13}$'
+          description: ID único de la notificación
+      responses:
+        '200':
+          description: Estado de la notificación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '404':
+          description: Notificación no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/batch:
+    post:
+      summary: Envío masivo de notificaciones (ADMIN only)
+      operationId: sendBatchNotifications
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - notifications
+              properties:
+                notifications:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/NotificationRequest'
+                  minItems: 1
+                  maxItems: 100
+                  description: Máximo 100 notificaciones por batch
+      responses:
+        '202':
+          description: Batch aceptado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batchId:
+                    type: string
+                  totalQueued:
+                    type: integer
+        '403':
+          description: Requiere rol ADMIN

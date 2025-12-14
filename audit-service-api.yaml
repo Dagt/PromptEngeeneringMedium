@@ -1,0 +1,232 @@
+openapi: 3.0.3
+info:
+  title: Audit Service API
+  description: API para auditoría y trazabilidad de operaciones bancarias - Banco del Pacífico
+  version: 1.0.0
+  contact:
+    name: Compliance & Audit Team
+    email: audit@bancoPacifico.com.mx
+
+servers:
+  - url: https://api.bancoPacifico.com.mx/api/v1
+    description: Production server
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key proporcionada por el equipo de compliance
+
+  schemas:
+    AuditLogRequest:
+      type: object
+      required:
+        - action
+        - userId
+      properties:
+        action:
+          type: string
+          enum: [CREATE, UPDATE, DELETE, VIEW, EXPORT]
+        userId:
+          type: string
+          pattern: '^USR-[0-9]{6}$'
+          example: USR-123456
+        resource:
+          type: string
+          example: /api/v1/accounts/ACC-1234567890
+        ipAddress:
+          type: string
+          format: ipv4
+        metadata:
+          type: object
+          additionalProperties: true
+
+    AuditLogResponse:
+      type: object
+      properties:
+        logId:
+          type: string
+          example: AUD-2025012700001
+        timestamp:
+          type: string
+          format: date-time
+        action:
+          type: string
+        userId:
+          type: string
+        resource:
+          type: string
+        ipAddress:
+          type: string
+        geoLocation:
+          type: object
+          properties:
+            country:
+              type: string
+            city:
+              type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+        path:
+          type: string
+          description: Endpoint que generó el error
+        method:
+          type: string
+          description: Método HTTP usado
+        timestamp:
+          type: string
+          format: date-time
+
+paths:
+  /audit/logs:
+    post:
+      summary: Registrar evento de auditoría
+      operationId: createAuditLog
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditLogRequest'
+      responses:
+        '201':
+          description: Log de auditoría creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+        '400':
+          description: Request inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: API Key inválida
+
+    get:
+      summary: Consultar logs de auditoría
+      description: Permite filtrar logs por fecha, usuario, acción, etc.
+      operationId: queryAuditLogs
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Lista de logs de auditoría
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLogResponse'
+                  totalCount:
+                    type: integer
+        '500':
+          description: Error al consultar logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                errorCode: DATABASE_ERROR
+                errorMessage: Failed to execute query on audit_logs table
+                path: /api/v1/audit/logs
+                method: GET
+                timestamp: "2025-01-27T10:30:00Z"
+
+  /audit/logs/{logId}:
+    get:
+      summary: Obtener log específico
+      operationId: getAuditLogById
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: logId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^AUD-[0-9]{13}$'
+      responses:
+        '200':
+          description: Log encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+        '404':
+          description: Log no encontrado
+
+  /audit/reports/compliance:
+    get:
+      summary: Generar reporte de cumplimiento CNBV
+      description: |
+        Genera reporte regulatorio para la CNBV con todas las operaciones del período.
+        Incluye logs de acceso, modificaciones, y exportaciones de datos sensibles.
+      operationId: generateComplianceReport
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+            maximum: 2030
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [PDF, CSV, XML]
+            default: PDF
+      responses:
+        '200':
+          description: Reporte generado
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Parámetros inválidos
