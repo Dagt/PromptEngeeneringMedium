@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Loan Service API
+  description: API para gestión de préstamos - Banco del Pacífico
+  version: 1.0.0
+  contact:
+    name: Nova Solution Systems
+    email: api-support@novasolutionsystems.com
+
+servers:
+  - url: https://api.bancoPacifico.com.mx/api/v1
+    description: Production server
+
+security:
+  - OAuth2: [read:loans, write:loans]
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.bancoPacifico.com.mx/oauth/authorize
+          tokenUrl: https://auth.bancoPacifico.com.mx/oauth/token
+          scopes:
+            read:loans: Leer información de préstamos
+            write:loans: Crear y modificar préstamos
+
+  schemas:
+    LoanApplicationRequest:
+      type: object
+      required:
+        - customerId
+        - amount
+        - termMonths
+      properties:
+        customerId:
+          type: string
+          example: CUST-12345
+        amount:
+          type: number
+          format: double
+          example: 250000
+        termMonths:
+          type: integer
+          example: 24
+        purpose:
+          type: string
+
+    LoanResponse:
+      type: object
+      properties:
+        loanId:
+          type: string
+          example: LOAN-2025-001234
+        status:
+          type: string
+          enum: [PENDING_APPROVAL, APPROVED, REJECTED, DISBURSED]
+        approvedAmount:
+          type: number
+          format: double
+        interestRate:
+          type: number
+          format: double
+        creditScore:
+          type: integer
+          description: Score crediticio del cliente
+          example: 720
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        stackTrace:
+          type: string
+          description: Stack trace completo del error (solo en desarrollo)
+        internalCode:
+          type: string
+
+paths:
+  /loans/applications:
+    post:
+      summary: Solicitar nuevo préstamo
+      operationId: createLoanApplication
+      security:
+        - OAuth2: [write:loans]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequest'
+      responses:
+        '201':
+          description: Solicitud creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponse'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: InternalServerError
+                message: Error al procesar la solicitud
+                stackTrace: |
+                  java.lang.NullPointerException: Cannot invoke method getCustomer() on null object
+                  at com.banco.loans.service.LoanService.processApplication(LoanService.java:145)
+                  at com.banco.loans.controller.LoanController.createLoan(LoanController.java:78)
+                internalCode: DB_CONNECTION_FAILED
+
+  /loans/{loanId}:
+    get:
+      summary: Obtener detalles de préstamo
+      operationId: getLoanById
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Préstamo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponse'
+        '404':
+          description: Préstamo no encontrado
+
+  /loans/{loanId}/approve:
+    post:
+      summary: Aprobar préstamo (ADMIN only)
+      operationId: approveLoan
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approvedAmount:
+                  type: number
+                  format: double
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Préstamo aprobado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponse'
+        '403':
+          description: No autorizado para aprobar préstamos
