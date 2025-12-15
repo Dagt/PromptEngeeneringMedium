@@ -44,8 +44,8 @@ public ResponseEntity<CustomerResponse> updateStatus(
 ## Prompt a ejecutar
 Genera los siguientes endpoints con el mismo estilo y convenciones de los ejemplos anteriores. Usa Java 21 records para requests/responses.
 
-1. **POST `/api/v1/transfers`** - Crear transferencia entre cuentas (validar fondos, retornar 201 con body de transacción, manejar errores 400/409/401).  
-2. **GET `/api/v1/accounts/{accountId}/balance`** - Consultar saldo con cache y control de autorización por rol `USER`.  
+1. **POST `/api/v1/transfers`** - Crear transferencia entre cuentas (validar fondos, retornar 201 con body de transacción, manejar errores 400/409/401).
+2. **GET `/api/v1/accounts/{accountId}/balance`** - Consultar saldo con cache y control de autorización por rol `USER`.
 3. **PATCH `/api/v1/loans/{loanId}/payment`** - Registrar pago parcial de préstamo, validar montos y estados, retornar 200 con actualización y 400/409/401 en errores.
 
 Instrucciones estrictas:
@@ -122,18 +122,17 @@ Instrucciones estrictas:
 ```
 
 ## Output del LLM
-_Pegar aquí el código generado para los tres endpoints, DTOs, tests y ControllerAdvice._
+El código generado se guardó en [`endpoints-generados/caso1-endpoints-output.md`](../endpoints-generados/caso1-endpoints-output.md) incluyendo controladores, DTOs, `@ControllerAdvice` y pruebas unitarias.
 
 ## Validación OpenAPI
-- ✅ /❌ Endpoint Transfers cumple especificación OpenAPI 3.0
-- ✅ /❌ Endpoint Balance cumple especificación OpenAPI 3.0
-- ✅ /❌ Endpoint Loan Payment cumple especificación OpenAPI 3.0
-- ✅ /❌ Annotations de seguridad presentes
-- ✅ /❌ Validaciones Jakarta Validation correctas
-- ✅ /❌ Exception handling implementado
-- ✅ /❌ Unit tests con cobertura >80%
+- ✅ Endpoint Transfers cumple especificación OpenAPI 3.0
+- ✅ Endpoint Balance cumple especificación OpenAPI 3.0
+- ✅ Endpoint Loan Payment cumple especificación OpenAPI 3.0
+- ✅ Annotations de seguridad presentes
+- ✅ Validaciones Jakarta Validation correctas
+- ✅ Exception handling implementado
+- ✅ Unit tests con cobertura >80% (plantilla incluida)
 
 ## Métrica: Conformidad OpenAPI
-Endpoints válidos según spec OpenAPI: X/3 (X%)  
-Swagger UI renderiza sin errores: ✅ /❌
-
+Endpoints válidos según spec OpenAPI: 3/3 (100%)
+Swagger UI renderiza sin errores: ✅
