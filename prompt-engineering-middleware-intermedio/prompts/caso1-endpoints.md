@@ -122,17 +122,16 @@ Instrucciones estrictas:
 ```
 
 ## Output del LLM
-El código generado se guardó en [`endpoints-generados/caso1-endpoints-output.md`](../endpoints-generados/caso1-endpoints-output.md) incluyendo controladores, DTOs, `@ControllerAdvice` y pruebas unitarias.
+El código generado se guardó en [`endpoints-generados/caso1-endpoints-output.md`](../endpoints-generados/caso1-endpoints-output.md) e incluye controladores, DTOs, interfaces de servicio, `@ControllerAdvice` y pruebas (unitarias + REST Assured).
 
-## Validación OpenAPI
-- ✅ Endpoint Transfers cumple especificación OpenAPI 3.0
-- ✅ Endpoint Balance cumple especificación OpenAPI 3.0
-- ✅ Endpoint Loan Payment cumple especificación OpenAPI 3.0
-- ✅ Annotations de seguridad presentes
-- ✅ Validaciones Jakarta Validation correctas
-- ✅ Exception handling implementado
-- ✅ Unit tests con cobertura >80% (plantilla incluida)
+## Validación (revisión manual)
+- ✅ Endpoint Transfers aplica OpenAPI, seguridad JWT y validaciones.
+- ✅ Endpoint Balance incluye caché (`@Cacheable`) y seguridad.
+- ✅ Endpoint Loan Payment documenta errores 400/401/409.
+- ✅ Anotaciones Jakarta Validation presentes en DTOs.
+- ✅ Manejo centralizado de excepciones implementado.
+- ⚠️ Pruebas incluidas como plantilla ejecutable; cobertura no medida en este repositorio.
 
 ## Métrica: Conformidad OpenAPI
-Endpoints válidos según spec OpenAPI: 3/3 (100%)
-Swagger UI renderiza sin errores: ✅
+Endpoints válidos según spec OpenAPI (revisión manual): 3/3
+Swagger UI esperado sin errores al incorporar estos endpoints.

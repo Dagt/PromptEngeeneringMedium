@@ -28,7 +28,7 @@ public class TransferController {
 }
 ```
 
-## v2.0 - Métricas
+## v2.0 - Métricas (evaluación manual)
 | Métrica | Score |
 |---|---|
 | OpenAPI documentation | 80% |
@@ -105,7 +105,7 @@ public class BankingExceptionHandler {
 - **Unit**: TransferValidatorTests valida montos positivos y cuentas distintas; TransferServiceTests mockea FundsGateway y verifica excepción 409.
 - **Integration/REST Assured**: pruebas para 201 (transfer exitosa), 400 (payload inválido), 401 (sin token), 409 (fondos insuficientes) y verificación del header `Idempotency-Key`.
 
-## v3.0 - Métricas
+## v3.0 - Métricas (evaluación manual)
 | Métrica | Score |
 |---|---|
 | OpenAPI documentation | 100% |
