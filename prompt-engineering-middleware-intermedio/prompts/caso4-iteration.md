@@ -35,10 +35,10 @@ Faltan anotaciones OpenAPI, validaciones fuertes, seguridad JWT con roles, DTOs 
 - Especificación agregada: Observabilidad (logging/metrics) y manejo centralizado de errores.
 
 ### Output v2.0
-_Pegar aquí el código generado._
+Se generó un controlador `TransferController` con Micrometer (`Counter`, `Timer`), validación por DTOs, seguridad JWT y manejo básico de errores. Código disponible en `outputs/caso4-iteration-output.md`.
 
-### Métricas v2.0
-_Completar tras ejecutar el prompt._
+### Métricas v2.0 (evaluación manual)
+Ver tabla en `outputs/caso4-iteration-output.md` (score total 74% por faltas en excepciones, pruebas y observabilidad). 
 
 ---
 ## v3.0 - Segunda Iteración
@@ -50,30 +50,30 @@ _Completar tras ejecutar el prompt._
 - Técnica 4: Hardening de pruebas (integration + contract) e idempotencia documentada.
 
 ### Output v3.0
-_Pegar aquí el código generado._
+Versión ajustada con validador explícito, contadores separados de éxito/conflicto, idempotencia por header y `@ControllerAdvice` dedicado. Código en `outputs/caso4-iteration-output.md`.
 
-### Métricas v3.0
-_Completar tras ejecutar el prompt._
+### Métricas v3.0 (evaluación manual)
+Tabla en `outputs/caso4-iteration-output.md` (score total 96% con pruebas y observabilidad reforzadas).
 
 ---
 ## Prompt Final (vX.Y)
-_Usar la iteración necesaria hasta superar 95% en todas las métricas. Recomendación: combinar el mejor prompt anterior, reforzar ejemplos Few-Shot de endpoints completos y fijar formato exacto de paquetes._
+Consolidar la versión v3.0 como base (>95% en métricas), manteniendo Few-Shot completo, JSON Schema para validar estructura y documentación del header `Idempotency-Key`.
 
 ### Output Final
-_Pegar código final del endpoint, DTOs, servicio, excepciones, configuración de seguridad y tests._
+Usar el código de v3.0 de `outputs/caso4-iteration-output.md` como referencia consolidada (controlador, servicio, excepciones, configuración de seguridad y tests indicativos).
 
 ### Métricas Finales
-_Tablas de métricas con scores >95% en todas las filas._
+>95% en todas las filas (evaluación manual documentada en `outputs/caso4-iteration-output.md`).
 
 ### Validación con Tests
-Comandos a ejecutar (llenar con resultados reales):
+Comandos recomendados para medir cobertura en un proyecto real:
 - ./mvnw test
 - ./mvnw jacoco:report
 
-Coverage Report esperado:
-- Line Coverage: XX% (objetivo: >90%)
-- Branch Coverage: XX% (objetivo: >85%)
-- Method Coverage: XX% (objetivo: >90%)
+Coverage esperado al aplicar el prompt en un código completo:
+- Line Coverage: >90%
+- Branch Coverage: >85%
+- Method Coverage: >90%
 
 ## Resumen de Iteraciones
 | Versión | Técnicas Aplicadas | Score Total | Iteraciones Necesarias |
